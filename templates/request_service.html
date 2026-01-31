@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Service Details
+{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <ul class="mb-0">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>    
+{% endif %}
+{% endwith %}
+    <div class="container-service_detail">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+            <div class="card mb-4">
+                <div class="card-header text-center bg-primary text-white">
+                    <h5>Service Details : {{ service.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Service ID:</strong> {{ service.id }}</p>
+                    <p><strong>Description:</strong> {{ service.description }}</p>
+                    <p><strong>Price:</strong> {{ service.base_price }}</p>
+                    <p><strong>Time Required:</strong> {{ service.time_required }} hr</p>
+                </div>
+            </div>
+        </div>
+    </div>
+        {% if not professional %}
+        <div class="alert alert-warning">
+            No service professional is assigned or approved for this service.
+        </div>
+        {% else %}
+        <div class="col-sm-12 d-flex flex-column align-items-center">
+            <form method="POST">
+                <select class="form-select" id="profname" name="profname" required>
+                    <option value="">Professional Available</option>
+                    {% for professional in professional %}
+                        <option value="{{ professional.user.full_name }}">{{ professional.user.full_name }}  |  Average Rating : {{professional.avg_rating}}</option>
+                    {% endfor %}
+                </select><br>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-cart-plus"></i> Request Service</button>
+                <a href="{{ url_for('home_c') }}" class="btn btn-secondary">Back to Home</a>
+            </form>
+            <br>
+            
+        </div>
+        {% endif %}
+{% endblock %}

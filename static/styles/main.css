@@ -1,0 +1,112 @@
+.curved-box {
+    background-color: white;
+    border-radius: 20px; 
+    border: 2px solid black;
+    padding: 5px;
+    margin: 0 auto; 
+    max-width: 1000px; 
+    height: 400px;
+    margin-top: 100px;
+  }
+
+.head_text{
+    color: rgb(25, 120, 215);
+}
+
+.curved-box_c {
+    background-color: white;
+    border-radius: 20px; 
+    border: 2px solid black;
+    padding: 0px;
+    margin: 0 auto; 
+    max-width: 1000px; 
+    height: 475px;
+    margin-top: 50px;
+}
+
+.curved-box_p {
+    background-color: white;
+    border-radius: 20px; 
+    border: 2px solid black;
+    padding: 0px;
+    margin: 0 auto; 
+    max-width: 1000px; 
+    height: 550px;
+    margin-top: 50px;
+}
+
+.container_search {
+    margin-top: 30px;
+    margin: center ;
+}
+
+.container-service_detail{
+    margin-top: 30px;
+
+}
+
+.not_found {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 20px;
+    color: rgb(255, 0, 0);
+}
+
+.nav-item.float-end {
+    float: right;
+    margin-left: 10px; 
+  }
+
+.container_home {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0px auto;
+}
+
+.hero-section {
+    background: url('/static/images/header.jpg') no-repeat center center/cover;
+    color: #fff;
+    text-align: center;
+    padding: 135px 20px;
+    position: relative;
+}
+
+.hero-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+main {
+    margin: 20px 0px 20px 0px;
+}
+
+.about {
+    text-align: center;
+    padding: 63px 20px;
+    background: #f9f9f9;
+}
+
+
+footer {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 50px 0;
+    margin-top: 0;
+    font-size: 20px;
+}
+
+
+.block{
+    text-align: center;
+}

@@ -1,0 +1,148 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <ul class="mb-0">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+{% endwith %}   
+<div class="container_search">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form class="d-flex" role="search" method="POST">
+                <label class="me-2" style="font-size: 1.5em; white-space: nowrap;">Search by:</label>
+                <select class="form-select me-2" name="search_by" aria-label="Search by" >
+                    <option value="" selected>Select Option</option>
+                    <option value="Service Name" {% if search_by == 'Service Name' %}selected{% endif %}>Service Name</option>
+                    <option value="Customer" {% if search_by == 'Customer' %}selected{% endif %}>Customer</option>
+                    <option value="Professional" {% if search_by == 'Professional' %}selected{% endif %}>Professional</option>
+                    <option value="Service Status" {% if search_by == 'Service Status' %}selected{% endif %}>Status of Service</option>
+                </select>
+                <input class="form-control me-2" type="search" name="search" placeholder="Enter search word" value="{{ search }}" aria-label="Search">
+                <button class=" form-control btn btn-success" type="submit"> <i class="fas fa-search"></i> Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+    
+
+    <br>
+
+    {% if search_by == 'Service Name' and (services or services_baseprice or services_time) %}
+        <h3>Services</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Service Name</th>
+                    <th>Price</th>
+                    <th>Time Required</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in (services or services_baseprice or services_time) %}
+                    <tr>
+                        <td>{{ service.id }}</td>
+                        <td>{{ service.name }}</td>
+                        <td>{{ service.base_price }}</td>
+                        <td>{{ service.time_required }}</td>
+                        <td>{{ service.description }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% elif search_by == 'Customer' and (customers or customers_address or customers_pincode) %}
+        <h3>Customers</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer Name</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Pincode</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in (customers or customers_address or customers_pincode) %}
+                    <tr>
+                        <td>{{ customer.id }}</td>
+                        <td>{{ customer.user.full_name }}</td>
+                        <td>{{ customer.user.email }}</td>
+                        <td>{{ customer.user.address }}</td>
+                        <td>{{ customer.user.pincode }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% elif search_by == 'Professional' and (professionals or professionals_service or professionals_address or professionals_experience or professionals_status)%}
+        <h3>Service Professionals</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Professional Name</th>
+                    <th>Service</th>
+                    <th>Experience</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for professional in (professionals or professionals_service or professionals_address or professionals_experience or professionals_status) %}
+                    <tr>
+                        <td>{{ professional.id }}</td>
+                        <td>{{ professional.user.full_name }}</td>
+                        <td>{{ professional.service_name }}</td>
+                        <td>{{ professional.experience }}</td>
+                        <td>{{ professional.user.address }}</td>
+                        <td>{{ professional.professional_status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% elif search_by == 'Service Status' and service_requests %}
+        <h3>Service Requests</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Assigned Professional</th>
+                    <th>Service Name</th>
+                    <th>Requested Dt</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in service_requests %}
+                    <tr>
+                        <td>{{ request.service_id }}</td>
+                        <td>{{ request.customer.user.full_name }}</td>
+                        <td>{{ request.professional.user.full_name if request.professional else 'Not Assigned' }}</td>
+                        <td>{{ request.service.name }}</td>
+                        <td>{{ request.date_of_request.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ request.service_status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif search %}
+        <h2><p class="not_found">No result found</p></h2>
+    {% endif %}
+{% endblock %}

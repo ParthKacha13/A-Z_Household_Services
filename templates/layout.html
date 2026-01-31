@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+            Household Services
+        {% endblock %}
+    </title>
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-zR2Th/03XTt10CvdkkNCX4f1yPW+iK4MveR0+qyyiAGM4QHX1hRXgNS/Qh1z7q/pe+rADczhKV+INGvAVSAIb1uB4ztJ0k" 
+ crossorigin="anonymous"/>
+        {% block style %}
+            
+        {% endblock %}   
+</head>
+<body>
+ 
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid" >
+      {% if user_session['role'] == 'admin' %}
+      <a class="navbar-brand"><i class="fa-solid fa-user"></i>  Admin</a>
+      {% elif user_session['role'] == 'Customer' %}
+      <a class="navbar-brand" ><i class="fa-solid fa-user"></i> Customer</a>
+      {% elif user_session['role'] == 'Serviceprofessional' %}
+      <a class="navbar-brand" ><i class="fa-solid fa-user"></i>Professional</a>
+      {% endif %}
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      {% if user_session['role'] == 'admin' %}
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link " aria-current="page" href="home_a">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="search_a">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link summary" href="#summary">Summary</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="logout">Logout</a>
+          </li>
+        </ul>
+      </div>
+
+      {% elif user_session['role'] == 'Customer' %}
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link " aria-current="page" href="home_c">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="search_c">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#summary">Summary</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="profile_customer">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="logout">Logout</a>
+          </li>
+        </ul>
+      </div>
+
+      {% elif user_session['role'] == 'Serviceprofessional' %}
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link " aria-current="page" href="home_p">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="search_p">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#summary">Summary</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="profile_service">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="logout">Logout</a>
+          </li>
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </nav>
+
+    {% block content %}
+        
+    {% endblock %}
+
+    {% block script %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    {% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/6685473929.js" crossorigin="anonymous"></script>
+</body>
+
+</html>
+

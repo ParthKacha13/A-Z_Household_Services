@@ -1,0 +1,84 @@
+{%extends 'layout.html' %}
+
+{%block title%}
+    Profile
+{%endblock%}
+
+{%block content%}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <ul class="mb-0">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+{% endwith %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header text-center bg-primary text-white">
+                    <h4><i class="fa-regular fa-user"></i> {{ user.full_name }}'s Profile</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2 row">
+                        <label class="col-sm-4 col-form-label"><strong>ID:</strong></label>
+                        <div class="col-sm-8">
+                            <p class="form-control-plaintext">{{ service_professional.id }}</p>
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label class="col-sm-4 col-form-label"><strong>Full Name:</strong></label>
+                        <div class="col-sm-8">
+                            <p class="form-control-plaintext">{{ user.full_name }}</p>
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label class="col-sm-4 col-form-label"><strong>Email:</strong></label>
+                        <div class="col-sm-8">
+                            <p class="form-control-plaintext">{{ user.email }}</p>
+                        </div>
+                    </div>
+                    <div class="mb-2 row">
+                        <label class="col-sm-4 col-form-label"><strong>Service Name:</strong></label>
+                        <div class="col-sm-8">
+                            <p class="form-control-plaintext">{{ service_professional.service_name }}</p>
+                        </div>
+                        <div class="mb-2 row">
+                            <label class="col-sm-4 col-form-label"><strong>Status:</strong></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-plaintext">{{ service_professional.professional_status }}</p>
+                            </div>
+                        </div>
+                        <div class="mb-2 row">
+                            <label class="col-sm-4 col-form-label"><strong>Experience:</strong></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-plaintext">{{ service_professional.experience }}</p>
+                            </div>
+                        </div>
+                        <div class="mb-2 row">
+                            <label class="col-sm-4 col-form-label"><strong>Address:</strong></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-plaintext">{{ user.address }}</p>
+                            </div>
+                        </div>
+                        <div class="mb-2 row">
+                            <label class="col-sm-4 col-form-label"><strong>Pincode:</strong></label>
+                            <div class="col-sm-8">
+                                <p class="form-control-plaintext">{{ user.pincode }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="/edit_professional" class="btn btn-primary"><i class="fas fa-edit"></i> Edit Profile</a>
+                    <a href="/home_p" class="btn btn-secondary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}

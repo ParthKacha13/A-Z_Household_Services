@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block title %}Professional Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header text-center bg-primary text-white">
+                    <h4><i class="fa-regular fa-user"></i> {{ user.full_name }}'s Profile</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 row">
+                        <p><strong>ID:</strong> {{ professional.id }}</p>
+                    </div>
+                    <div class="mb-3 row">
+                        <p><strong>Full Name:</strong> {{ user.full_name }}</p>
+                    </div>
+                    <div class="mb-3 row">
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                    </div>
+                    <div class="mb-3 row">
+                        <p><strong>Experience:</strong> {{ professional.experience }} years</p>
+                    </div>
+                    <div class="mb-3 row">
+                        <p><strong>Service Name:</strong> {{ professional.service_name }}</p>
+                    </div>
+                    <div class="mb-3 row">
+                        <p><strong>Address:</strong> {{ user.address }}</p>
+                    </div>
+                    <div class="mb-3 row">
+                        <p><strong>Pincode:</strong> {{ user.pincode }}</p>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{{ url_for('home_a') }}" class="btn btn-primary">Back to Admin Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

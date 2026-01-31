@@ -1,0 +1,173 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Search Service
+{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <ul class="mb-0">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+{% endwith %}
+<div class="container_search">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form class="d-flex" role="search" method="POST">
+                <label class="me-2" style="font-size: 1.5em; white-space: nowrap;">Search by:</label>
+                <select class="form-select me-2" name="search_by" aria-label="Search by" >
+                    <option value="" selected>Select Option</option>
+                    <option value="Service Name"{% if search_by == 'Service Name' %}selected{% endif %}>Service Name</option>
+                    <option value="Address"{% if search_by == 'Address' %}selected{% endif %}>Address</option>
+                    <option value="Pincode"{% if search_by == 'Pincode' %}selected{% endif %}>Pincode</option>
+                    <option value="Price"{% if search_by == 'Price' %}selected{% endif %}>Price</option>
+                </select>
+                <input class="form-control me-2" type="search" name="search" placeholder="Enter search word" value="{{ search }}" aria-label="Search">
+                <button class="form-control btn btn-success" type="submit"><i class="fas fa-search"></i> Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+<br>
+
+    {% if search_by == 'Service Name' and (service_name) %}
+        <h3>Services</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Service Name</th>
+                    <th>Price</th>
+                    <th>Time Required</th>
+                    <th>Description</th>
+                    <th>Request Service</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in service_name %}
+                    <tr>
+                        <td>{{ request.id }}</td>
+                        <td>{{ request.name }}</td>
+                        <td>{{ request.base_price }}</td>
+                        <td>{{ request.time_required }}</td>
+                        <td>{{ request.description }}</td>
+                        <td><a href="{{ url_for('request_service', service_id=request.id) }}" class="btn btn-primary">
+                            <i class="fas fa-cart-plus"></i>
+                            BOOK
+                        </a> </td>
+                        
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% elif search_by == 'Price' and (service_price) %}
+        <h3>Services</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Service Name</th>
+                    <th>Price</th>
+                    <th>Time Required</th>
+                    <th>Description</th>
+                    <th>Request Service</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in service_price %}
+                    <tr>
+                        <td>{{ request.id }}</td>
+                        <td>{{ request.name }}</td>
+                        <td>{{ request.base_price }}</td>
+                        <td>{{ request.time_required }}</td>
+                        <td>{{ request.description }}</td>
+                        <td><a href="{{ url_for('request_service', service_id=request.id) }}" class="btn btn-primary">
+                            <i class="fas fa-cart-plus"></i>
+                            BOOK
+                        </a> </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% elif search_by=="Pincode" and (service_pincode)%}
+        <h3>Services</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Service Name</th>
+                    <th>Professional Name</th>
+                    <th>Professional Address</th>
+                    <th>Professional Pincode</th>
+                    <th>Price</th>
+                    <th>Request Service</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in service_pincode %}
+                    <tr>
+                        <td>{{ request.id }}</td>
+                        <td>{{ request.service.name }}</td>
+                        <td>{{ request.user.full_name }}</td>
+                        <td>{{ request.user.address }}</td>
+                        <td>{{ request.user.pincode }}</td>
+                        <td>{{ request.service.base_price }}</td>
+                        <td><a href="{{ url_for('request_service', service_id=request.id) }}" class="btn btn-primary">
+                            <i class="fas fa-cart-plus"></i>
+                            BOOK
+                        </a> </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+    {% elif search_by == 'Address' and (service_address)%}
+        <h3>Services</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Service Name</th>
+                    <th>Professional Name</th>
+                    <th>Professional Email</th>
+                    <th>Professional Address</th>
+                    <th>Price</th>
+                    <th>Request Service</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in service_address%}
+                        <tr>
+                            <td>{{ request.service.id }}</td>
+                            <td>{{ request.service.name }}</td>
+                            <td>{{ request.user.full_name }}</td>
+                            <td>{{ request.user.email }}</td>
+                            <td>{{ request.user.address }}</td>
+                            <td>{{ request.service.base_price }}</td>
+                            <td><a href="{{ url_for('request_service', service_id=request.id) }}" class="btn btn-primary">
+                                <i class="fas fa-cart-plus"></i>
+                                BOOK
+                            </a> </td>
+                        </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif search %}
+        <h2><p class="not_found">No result found</p></h2>
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+    
+{% endblock %}

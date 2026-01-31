@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Review Service
+{% endblock %}
+
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header text-center bg-primary text-white">
+                    <h4>{{servicename}} Service Remarks</h4>
+                    <h5>Request ID:{{service_request.service_id}}</h5>
+                </div>
+                <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3 row">
+                        <p><strong>Rating in <i class="fa-regular fa-star"><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i>:</strong></p>
+                        <input type="number" name="rating" class="form-control" required>
+                    </div>
+                    <div class="mb-3 row">
+                        <p><strong>Comment(If any):</strong> </p>
+                        <textarea name="comment" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <a href="{{ url_for('home_c') }}" class="btn btn-primary">Back</a>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
