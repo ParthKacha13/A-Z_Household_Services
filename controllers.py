@@ -1,10 +1,14 @@
 from flask import Flask,render_template,request,redirect,url_for,flash,session,jsonify  
 from sqlalchemy import and_
-from app import app
+# from bp import bp
 from models import db,User,Service,ServiceProfessional,ServiceRequest,Customer,Review,RejectedRequest
 from werkzeug.security import generate_password_hash,check_password_hash
 from datetime import date,datetime
 from functools import wraps
+from flask import Blueprint
+
+bp = Blueprint("main", __name__)
+
 
 # --Login--
 def login_required(fun):
@@ -75,7 +79,7 @@ def login_customer(fun):
         return fun(*args,**kwargs)
     return func_c
 
-@app.route('/block',methods=['GET','POST'])
+@bp.route('/block',methods=['GET','POST'])
 def block():
     if request.method=='POST':
         action=request.form.get('action')
@@ -83,7 +87,7 @@ def block():
             return redirect(url_for('login'))
     return render_template('block.html')
 
-@app.route('/login', methods=['GET','POST'])
+@bp.route('/login', methods=['GET','POST'])
 def login():
     if request.method=='GET':
         return render_template('login.html')
@@ -115,7 +119,7 @@ def login():
 
 
 # --Logout--
-@app.route('/logout')
+@bp.route('/logout')
 @login_required
 def logout():
     session.pop('user_id')
@@ -124,16 +128,16 @@ def logout():
 
 # --Admin--
 
-# @app.route('/', methods=['GET'])
+# @bp.route('/', methods=['GET'])
 # def homepage():
 #     if request.method=='GET':
 #         return render_template('homepage.html')
-@app.route('/')
+@bp.route('/')
 def homepage():
     return render_template('homepage.html')
 
 
-@app.route('/home_a')
+@bp.route('/home_a')
 @login_admin
 def home_a():
     user_session=User.query.get(session['user_id'])
@@ -145,7 +149,7 @@ def home_a():
 
     return render_template('home_a.html',professionals=professionals,user_session=user_session,user=user,services=services,service_requests=service_requests,customers=customers)
 
-@app.route('/rating-data')
+@bp.route('/rating-data')
 def rating_data():
     closed_requests = ServiceRequest.query.filter_by(service_status='Closed').all()
 
@@ -162,7 +166,7 @@ def rating_data():
 
     return jsonify(data)
 
-@app.route('/servicereq-data')
+@bp.route('/servicereq-data')
 def servicereq_data():
     service_requests = ServiceRequest.query.all()
     requests = {'Requested': 0, 'Accepted': 0, 'Closed': 0, 'Rejected': 0}
@@ -177,7 +181,7 @@ def servicereq_data():
     }
     return jsonify(data)
 
-@app.route('/new_service',methods=['GET','POST'])
+@bp.route('/new_service',methods=['GET','POST'])
 @login_admin
 def new_service():
     if request.method=='GET':
@@ -199,7 +203,7 @@ def new_service():
         flash('Service added successfully!')
         return redirect(url_for('home_a'))
 
-@app.route('/edit_service/<int:id>',methods=['GET','POST'])
+@bp.route('/edit_service/<int:id>',methods=['GET','POST'])
 @login_admin
 def edit_new_service(id):
     if request.method=='GET':
@@ -228,7 +232,7 @@ def edit_new_service(id):
         flash('Service edited!')
         return redirect(url_for('home_a'))
 
-@app.route('/delete_service/<int:id>',methods=['POST'])
+@bp.route('/delete_service/<int:id>',methods=['POST'])
 @login_admin
 def delete_service(id):
     service=Service.query.get(id)
@@ -249,7 +253,7 @@ def delete_service(id):
     
     return redirect(url_for('home_a'))
 
-@app.route('/service_profile/<int:professional_id>')
+@bp.route('/service_profile/<int:professional_id>')
 @login_admin
 def service_profile(professional_id):
     user_session=User.query.get(session['user_id'])
@@ -257,7 +261,7 @@ def service_profile(professional_id):
     user=User.query.get(professional.user_id)
     return render_template('service_profile.html',professional=professional,user=user,user_session=user_session)
 
-@app.route('/update_customer_status/<int:id>',methods=['POST'])
+@bp.route('/update_customer_status/<int:id>',methods=['POST'])
 @login_admin
 def update_customer_status(id):
     customer=Customer.query.get(id)
@@ -280,7 +284,7 @@ def update_customer_status(id):
     flash(f"Professional has been {action}ed")
     return redirect(url_for('home_a'))
 
-@app.route('/update_professional_status/<int:id>',methods=['POST'])
+@bp.route('/update_professional_status/<int:id>',methods=['POST'])
 @login_admin
 def update_professional_status(id):
         professional = ServiceProfessional.query.get(id)
@@ -290,7 +294,7 @@ def update_professional_status(id):
         user=professional.user
         action=request.form.get('action')
         if action=='accept':
-            professional.professional_status='Approved'
+            professional.professional_status='bproved'
         elif action=='reject':
             professional.professional_status='Rejected'
         elif action=='block':
@@ -311,7 +315,7 @@ def update_professional_status(id):
         flash(f"Professional has been {action}ed")
         return redirect(url_for('home_a'))
 
-@app.route('/search_a', methods=['GET', 'POST'])
+@bp.route('/search_a', methods=['GET', 'POST'])
 @login_admin
 def search_a():
     user_session=User.query.get(session['user_id']) 
@@ -374,7 +378,7 @@ def search_a():
         professionals=professionals, services=services, customers=customers
     )
 
-@app.route('/summary/admin')
+@bp.route('/summary/admin')
 @login_admin
 def summary_admin():
     user_session=User.query.get(session['user_id'])
@@ -387,7 +391,7 @@ def summary_admin():
 
 #  --Customer--  
 
-@app.route('/customer_signup',methods=['GET','POST'])
+@bp.route('/customer_signup',methods=['GET','POST'])
 def customer_signup():
     if request.method=='GET':
         return render_template('customer_signup.html')
@@ -415,7 +419,7 @@ def customer_signup():
 
         return redirect(url_for('login'))
 
-@app.route('/profile_customer')
+@bp.route('/profile_customer')
 @login_customer
 @is_blocked
 def profile_customer():
@@ -423,7 +427,7 @@ def profile_customer():
     user_session=User.query.get(session['user_id'])
     return render_template('profile_customer.html',user=user,user_session=user_session)
 
-@app.route('/edit_customer',methods=['GET','POST'])
+@bp.route('/edit_customer',methods=['GET','POST'])
 @login_customer
 @is_blocked
 def edit_customer():
@@ -463,7 +467,7 @@ def edit_customer():
         flash('Profile updated !')
         return redirect(url_for('profile_customer'))
 
-@app.route('/home_c')
+@bp.route('/home_c')
 @login_customer
 @is_blocked
 def home_c():
@@ -472,10 +476,10 @@ def home_c():
     services=Service.query.all()
     customer = Customer.query.filter_by(user_id=session['user_id']).first()
     service_history = ServiceRequest.query.filter_by(customer_id=customer.id).all() 
-    service_professionals = ServiceProfessional.query.join(User).filter(ServiceProfessional.professional_status == 'Approved')
+    service_professionals = ServiceProfessional.query.join(User).filter(ServiceProfessional.professional_status == 'bproved')
     return render_template('home_c.html',user_session=user_session,users=users,services=services,service_history=service_history,service_professionals=service_professionals)
 
-@app.route('/customer-chart')
+@bp.route('/customer-chart')
 def customer_chart():
         user=User.query.get(session['user_id'])
         service_requests = ServiceRequest.query.filter_by(customer_id=user.customer.id).all()
@@ -491,7 +495,7 @@ def customer_chart():
         }
         return jsonify(data)
 
-@app.route('/request_service/<int:service_id>', methods=['GET', 'POST'])
+@bp.route('/request_service/<int:service_id>', methods=['GET', 'POST'])
 @login_customer
 @is_blocked
 def request_service(service_id):
@@ -502,10 +506,10 @@ def request_service(service_id):
         flash("You must be logged in to request a service.")
         return redirect(url_for('login'))
 
-    professional = ServiceProfessional.query.filter_by(service_id=service_id, professional_status='Approved').all()
+    professional = ServiceProfessional.query.filter_by(service_id=service_id, professional_status='bproved').all()
     
     if not professional:
-        flash("No service professional is assigned or approved for this service.")
+        flash("No service professional is assigned or bproved for this service.")
         return redirect(url_for('home_c'))
     
     professional_id = None
@@ -518,9 +522,9 @@ def request_service(service_id):
         
         professional_id = request.form.get('profname')
 
-        selected_professional = ServiceProfessional.query.filter_by(service_id=service_id, professional_status='Approved', user_id=User.query.filter_by(full_name=professional_id).first().id).first()
+        selected_professional = ServiceProfessional.query.filter_by(service_id=service_id, professional_status='bproved', user_id=User.query.filter_by(full_name=professional_id).first().id).first()
         if not selected_professional:
-            flash("Service professional not found or not approved.")
+            flash("Service professional not found or not bproved.")
             return redirect(url_for('home_c'))
         
         new_request = ServiceRequest(service_id=service.id,  customer_id=customer_id.id,professional_id=selected_professional.id if selected_professional else None)
@@ -537,7 +541,7 @@ def request_service(service_id):
     return render_template('request_service.html',user=user,user_session=user_session,professional_id=professional_id ,service=service,professional=professional)
 
 
-@app.route('/close_service/<int:service_request_id>', methods=['POST'])
+@bp.route('/close_service/<int:service_request_id>', methods=['POST'])
 @login_customer
 @is_blocked
 def close_service(service_request_id):
@@ -563,7 +567,7 @@ def close_service(service_request_id):
 
     return redirect(url_for('home_c'))
 
-@app.route('/cancel_service/<int:service_request_id>', methods=['POST'])
+@bp.route('/cancel_service/<int:service_request_id>', methods=['POST'])
 @login_customer
 @is_blocked
 def cancel_service(service_request_id):
@@ -588,7 +592,7 @@ def update_avg_rating(professional_id):
         professional.avg_rating = avg_rating
         db.session.commit()
 
-@app.route('/review_service/<int:service_request_id>', methods=['GET', 'POST'])
+@bp.route('/review_service/<int:service_request_id>', methods=['GET', 'POST'])
 @login_customer
 @is_blocked
 def review_service(service_request_id):
@@ -647,7 +651,7 @@ def review_service(service_request_id):
 
     return render_template('review_service.html',user_session=user_session ,service_request=service_request,servicename=service.name)
 
-@app.route('/search_c', methods=['GET', 'POST'])
+@bp.route('/search_c', methods=['GET', 'POST'])
 @login_customer
 @is_blocked
 def search_c():
@@ -692,7 +696,7 @@ def search_c():
     return render_template('search_c.html',customer=customer,user=user,user_session=user_session,service=service,search=search_word,search_by=search_by,service_name=service_name,service_pincode=service_pincode,service_address=service_address,service_price=service_price)
 
 
-@app.route('/summary/customer')
+@bp.route('/summary/customer')
 @login_customer
 @is_blocked
 def summary_customer():
@@ -706,7 +710,7 @@ def summary_customer():
 
 # --Professional--
 
-@app.route('/service_professional_signup',methods=['GET','POST'])
+@bp.route('/service_professional_signup',methods=['GET','POST'])
 def service_professional_signup():
     if request.method=='GET':
         services = Service.query.all() 
@@ -745,7 +749,7 @@ def service_professional_signup():
             flash('You have successfully registered. Please login to continue.')
             return (redirect(url_for('login'))) 
 
-@app.route('/profile_service')
+@bp.route('/profile_service')
 @login_prosessional
 @is_blocked
 def profile_service():
@@ -754,7 +758,7 @@ def profile_service():
     service_professional = ServiceProfessional.query.filter_by(user_id=user.id).first()
     return render_template('profile_service.html',user=user,service_professional=service_professional,user_session=user_session)
 
-@app.route('/home_p')
+@bp.route('/home_p')
 @login_prosessional
 @is_blocked
 def home_p():
@@ -786,7 +790,7 @@ def home_p():
     professional = ServiceProfessional.query.filter_by(user_id=user.id).first()
     return render_template('home_p.html',user=user,user_session=user_session, professional=professional,service_requests=service_requests,service_requests_p=service_requests_p ,service_requests_t=service_requests_t,customers=customers,customers_p=customers_p ,customers_t=customers_t)
 
-@app.route('/personal-rating')
+@bp.route('/personal-rating')
 def personal_rating():
     user=User.query.get(session['user_id'])
     service_requests = ServiceRequest.query.filter_by(professional_id=user.professional.id,service_status='Closed').all()
@@ -804,7 +808,7 @@ def personal_rating():
 
     return jsonify(data)
 
-@app.route('/service-status-data')
+@bp.route('/service-status-data')
 def service_status_data():
     user=User.query.get(session['user_id'])
     service_requests = ServiceRequest.query.filter_by(professional_id=user.professional.id).all()
@@ -821,7 +825,7 @@ def service_status_data():
 
     return jsonify(data)
 
-@app.route('/edit_professional',methods=['GET','POST'])
+@bp.route('/edit_professional',methods=['GET','POST'])
 @login_prosessional
 @is_blocked
 def edit_professional():
@@ -879,7 +883,7 @@ def edit_professional():
         flash('Profile updated !')
         return redirect(url_for('profile_service'))
 
-@app.route('/view_customer/<int:request_id>')
+@bp.route('/view_customer/<int:request_id>')
 @login_prosessional
 @is_blocked
 def view_customer(request_id):
@@ -896,7 +900,7 @@ def view_customer(request_id):
 
     return render_template('view_customer.html', customer=customer,user_session=user_session)
 
-@app.route('/update_request_status/<int:request_id>', methods=['POST'])
+@bp.route('/update_request_status/<int:request_id>', methods=['POST'])
 @login_prosessional
 @is_blocked
 def update_request_status(request_id):
@@ -921,7 +925,7 @@ def update_request_status(request_id):
     flash(f"Request has been {action}ed.")
     return redirect(url_for('home_p'))
 
-@app.route('/complete_service/<int:request_id>', methods=['POST'])
+@bp.route('/complete_service/<int:request_id>', methods=['POST'])
 @login_prosessional
 @is_blocked
 def complete_service(request_id):
@@ -945,7 +949,7 @@ def complete_service(request_id):
     flash(f"Service has been successfully completed.")
     return redirect(url_for('home_p'))
 
-@app.route('/search_p', methods=['GET', 'POST'])
+@bp.route('/search_p', methods=['GET', 'POST'])
 @login_prosessional
 @is_blocked
 def search_p():
@@ -974,7 +978,7 @@ def search_p():
         return (render_template('search_p.html',user_session=user_session,search=search_word,search_by=search_by,service_requests=service_requests,professional=professional,user=user))
     return render_template('search_p.html',user_session=user_session,search=search_word,search_by=search_by,service_requests=service_requests,professional=professional,user=user)  
 
-@app.route('/summary/professional')
+@bp.route('/summary/professional')
 @login_prosessional
 @is_blocked
 def summary_professional():

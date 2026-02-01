@@ -108,30 +108,35 @@
 
 
 from flask import Flask
-from models import db, User
-from werkzeug.security import generate_password_hash
+from models import db
 import config
 
 def create_app():
     app = Flask(__name__)
+
+    # Load config
     app.config.from_object(config)
 
     # Init DB
     db.init_app(app)
 
-    # Import routes AFTER app & db
-    with app.app_context():
-        import controllers
-        db.create_all()
+    # Register blueprints
+    from controllers import bp
+    app.register_blueprint(bp)
 
-        # Create admin safely
+    # Create tables + admin safely
+    with app.app_context():
+        db.create_all()
+        from models import User
+        from werkzeug.security import generate_password_hash
+
         admin = User.query.filter_by(is_admin=True).first()
         if not admin:
             admin = User(
                 email="admin@gmail.com",
                 passhash=generate_password_hash("admin"),
-                full_name="Admin",
-                address="India",
+                full_name="admin",
+                address="india",
                 pincode="000000",
                 role="admin",
                 is_admin=True
@@ -142,4 +147,5 @@ def create_app():
     return app
 
 
+# REQUIRED for Gunicorn
 app = create_app()
