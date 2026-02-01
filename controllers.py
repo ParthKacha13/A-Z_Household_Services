@@ -18,7 +18,7 @@ def login_required(fun):
             return fun(*args,**kwargs)
         else:
             flash("Login to continue")
-            return redirect(url_for('main.main.login'))
+            return redirect(url_for('main.login'))
     return func
 
 def login_admin(fun):   
@@ -26,15 +26,15 @@ def login_admin(fun):
     def func_a(*args,**kwargs):
         if 'user_id' not in session:
             flash("Login to continue")
-            return redirect(url_for('main.main.login'))
+            return redirect(url_for('main.login'))
         user=User.query.get(session['user_id'])
         if not user.is_admin:
             if user.role=='Customer':
                 flash("You are not Admin!")
-                return redirect(url_for('main.main.home_c'))
+                return redirect(url_for('main.home_c'))
             else:
                 flash("You are not Admin!")
-                return redirect(url_for('main.main.home_p'))
+                return redirect(url_for('main.home_p'))
         return fun(*args,**kwargs)
     return func_a
 
@@ -43,14 +43,14 @@ def login_prosessional(fun):
     def func_p(*args,**kwargs):
         if 'user_id' not in session:
             flash("Login to continue")
-            return redirect(url_for('main.main.login'))
+            return redirect(url_for('main.login'))
         user=User.query.get(session['user_id'])
         if not user.role=='Serviceprofessional':
             if user.role=='Customer':
                 flash("You are not Service Professional!")
-                return redirect(url_for('main.main.home_c'))
+                return redirect(url_for('main.home_c'))
             else:
-                return redirect(url_for('main.main.home_a'))
+                return redirect(url_for('main.home_a'))
         return fun(*args,**kwargs)
     return func_p
 
@@ -59,7 +59,7 @@ def is_blocked(fun):
     def func_b(*args,**kwargs):
         user=User.query.get(session['user_id'])
         if user and user.is_blocked:
-            return redirect(url_for('main.main.block'))
+            return redirect(url_for('main.block'))
         return fun(*args,**kwargs)
     return func_b
 
@@ -68,14 +68,14 @@ def login_customer(fun):
     def func_c(*args,**kwargs):
         if 'user_id' not in session:
             flash("Login to continue")
-            return redirect(url_for('main.main.login'))
+            return redirect(url_for('main.login'))
         user=User.query.get(session['user_id'])
         if not user.role=='Customer':
             if user.role=='Serviceprofessional':
                 flash("You are not Customer!")
-                return redirect(url_for('main.main.home_p'))
+                return redirect(url_for('main.home_p'))
             else:
-                return redirect(url_for('main.main.home_a'))
+                return redirect(url_for('main.home_a'))
         return fun(*args,**kwargs)
     return func_c
 
@@ -84,7 +84,7 @@ def block():
     if request.method=='POST':
         action=request.form.get('action')
         if action=='back':
-            return redirect(url_for('main.main.login'))
+            return redirect(url_for('main.login'))
     return render_template('block.html')
 
 @bp.route('/login', methods=['GET','POST'])
@@ -99,23 +99,23 @@ def login():
 
         if user and check_password_hash(user.passhash,password) and user.is_admin==False and user.role=='Customer':
             if user.is_blocked:
-                return redirect(url_for('main.main.block'))
+                return redirect(url_for('main.block'))
             session['user_id']=user.id
             flash('Login Successfull !')
-            return redirect(url_for('main.main.home_c'))
+            return redirect(url_for('main.home_c'))
         elif user and check_password_hash(user.passhash,password) and user.is_admin==False and user.role=='Serviceprofessional' :
             if user.is_blocked:
-                return redirect(url_for('main.main.block'))
+                return redirect(url_for('main.block'))
             session['user_id']=user.id
             flash('Login Successfull !')
-            return redirect(url_for('main.main.home_p'))
+            return redirect(url_for('main.home_p'))
         elif user and check_password_hash(user.passhash,password) and user.is_admin==True:
             session['user_id']=user.id
             flash('Login Successfull !')
-            return redirect(url_for('main.main.home_a'))
+            return redirect(url_for('main.home_a'))
         else:
             flash("Invalid email or password")
-            return redirect(url_for('main.main.login'))
+            return redirect(url_for('main.login'))
 
 
 # --Logout--
@@ -123,7 +123,7 @@ def login():
 @login_required
 def logout():
     session.pop('user_id')
-    return redirect(url_for('main.main.homepage'))
+    return redirect(url_for('main.homepage'))
 
 
 # --Admin--
@@ -194,14 +194,14 @@ def new_service():
         time_required=request.form.get('time_required')
         if not service_name or not base_price or not time_required:
             flash('Please fill out all fields')
-            return redirect(url_for('main.main.new_service'))
+            return redirect(url_for('main.new_service'))
         
         new_service=Service(name=service_name,description=description,base_price=base_price,time_required=time_required)
         db.session.add(new_service)
         db.session.commit()
 
         flash('Service added successfully!')
-        return redirect(url_for('main.main.home_a'))
+        return redirect(url_for('main.home_a'))
 
 @bp.route('/edit_service/<int:id>',methods=['GET','POST'])
 @login_admin
@@ -209,12 +209,12 @@ def edit_new_service(id):
     if request.method=='GET':
         edit_service=Service.query.get(id)
         if not edit_service:
-            return(redirect(url_for('main.main.home_a')))
+            return(redirect(url_for('main.home_a')))
         return render_template('edit_service.html',service=edit_service)
     else:
         edit_service=Service.query.get(id)
         if not edit_service:
-            return(redirect(url_for('main.main.home_a')))
+            return(redirect(url_for('main.home_a')))
         service_name=request.form.get('service_name')
         description=request.form.get('description')
         base_price=request.form.get('base_price')
@@ -230,7 +230,7 @@ def edit_new_service(id):
             edit_service.base_price=base_price
         db.session.commit()
         flash('Service edited!')
-        return redirect(url_for('main.main.home_a'))
+        return redirect(url_for('main.home_a'))
 
 @bp.route('/delete_service/<int:id>',methods=['POST'])
 @login_admin
@@ -238,7 +238,7 @@ def delete_service(id):
     service=Service.query.get(id)
     if not service:
         flash('Service not available')
-        return redirect(url_for('main.main.home_a'))
+        return redirect(url_for('main.home_a'))
     action=request.form.get('action')
     if action=='delete':
         professionals = ServiceProfessional.query.filter_by(service_id=id).all()
@@ -251,7 +251,7 @@ def delete_service(id):
         db.session.commit()
         flash('Service deleted')
     
-    return redirect(url_for('main.main.home_a'))
+    return redirect(url_for('main.home_a'))
 
 @bp.route('/service_profile/<int:professional_id>')
 @login_admin
@@ -267,7 +267,7 @@ def update_customer_status(id):
     customer=Customer.query.get(id)
     if not customer:
         flash('Customer not found')
-        return redirect(url_for('main.main.home_a'))
+        return redirect(url_for('main.home_a'))
     user=customer.user
     action=request.form.get('action')
     if action=='block':
@@ -280,9 +280,9 @@ def update_customer_status(id):
             db.session.commit()
     else:
         flash('Invalid action')
-        return redirect(url_for('main.main.home_a'))
+        return redirect(url_for('main.home_a'))
     flash(f"Professional has been {action}ed")
-    return redirect(url_for('main.main.home_a'))
+    return redirect(url_for('main.home_a'))
 
 @bp.route('/update_professional_status/<int:id>',methods=['POST'])
 @login_admin
@@ -290,7 +290,7 @@ def update_professional_status(id):
         professional = ServiceProfessional.query.get(id)
         if not professional:
             flash('Professional not found')
-            return redirect(url_for('main.main.home_a'))
+            return redirect(url_for('main.home_a'))
         user=professional.user
         action=request.form.get('action')
         if action=='accept':
@@ -309,11 +309,11 @@ def update_professional_status(id):
                 db.session.commit()
         else:
             flash('Invalid action')
-            return redirect(url_for('main.main.home_a'))
+            return redirect(url_for('main.home_a'))
         
         db.session.commit()
         flash(f"Professional has been {action}ed")
-        return redirect(url_for('main.main.home_a'))
+        return redirect(url_for('main.home_a'))
 
 @bp.route('/search_a', methods=['GET', 'POST'])
 @login_admin
@@ -404,7 +404,7 @@ def customer_signup():
 
         if User.query.filter_by(email=email).first():
             flash("Email already registered")
-            return redirect(url_for('main.main.customer_signup'))
+            return redirect(url_for('main.customer_signup'))
         
         password_hash=generate_password_hash(password)
 
@@ -417,7 +417,7 @@ def customer_signup():
         db.session.commit()
         flash('You have successfully registered. Please login to continue.')
 
-        return redirect(url_for('main.main.login'))
+        return redirect(url_for('main.login'))
 
 @bp.route('/profile_customer')
 @login_customer
@@ -446,12 +446,12 @@ def edit_customer():
 
         if not email or not password:
             flash('Please fill required fields')
-            return redirect(url_for('main.main.edit_customer'))
+            return redirect(url_for('main.edit_customer'))
         
         existing_user = User.query.filter_by(email=email).first()
         if existing_user and existing_user.id != user.id:
             flash("Email already exists")
-            return redirect(url_for('main.main.edit_customer'))
+            return redirect(url_for('main.edit_customer'))
         
         new_pass_hash=generate_password_hash(password)
 
@@ -465,7 +465,7 @@ def edit_customer():
             user.pincode=pincode
         db.session.commit()
         flash('Profile updated !')
-        return redirect(url_for('main.main.profile_customer'))
+        return redirect(url_for('main.profile_customer'))
 
 @bp.route('/home_c')
 @login_customer
@@ -504,13 +504,13 @@ def request_service(service_id):
     user=User.query.get(session['user_id'])
     if not customer_id:
         flash("You must be logged in to request a service.")
-        return redirect(url_for('main.main.login'))
+        return redirect(url_for('main.login'))
 
     professional = ServiceProfessional.query.filter_by(service_id=service_id, professional_status='bproved').all()
     
     if not professional:
         flash("No service professional is assigned or bproved for this service.")
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     
     professional_id = None
 
@@ -518,25 +518,25 @@ def request_service(service_id):
         service = Service.query.get(service_id)
         if not service:
             flash("Service not found.")
-            return redirect(url_for('main.main.home_c'))
+            return redirect(url_for('main.home_c'))
         
         professional_id = request.form.get('profname')
 
         selected_professional = ServiceProfessional.query.filter_by(service_id=service_id, professional_status='bproved', user_id=User.query.filter_by(full_name=professional_id).first().id).first()
         if not selected_professional:
             flash("Service professional not found or not bproved.")
-            return redirect(url_for('main.main.home_c'))
+            return redirect(url_for('main.home_c'))
         
         new_request = ServiceRequest(service_id=service.id,  customer_id=customer_id.id,professional_id=selected_professional.id if selected_professional else None)
         db.session.add(new_request)
         db.session.commit()
         flash("Service requested successfully!")
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     
     service = Service.query.get(service_id)
     if not service:
         flash("Service not found.")
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
 
     return render_template('request_service.html',user=user,user_session=user_session,professional_id=professional_id ,service=service,professional=professional)
 
@@ -549,13 +549,13 @@ def close_service(service_request_id):
     
     if service_request.service_status=='Closed':
         flash('Service request closed already')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     if service_request.service_status=='Rejected':
         flash('Service request rejected')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     if service_request.service_status=='Requested':
         flash('Service request is not accepted yet')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     if service_request.service_status=='Completed':
         service_request.service_status = 'Closed'
         service_request.date_of_completion = datetime.now()
@@ -563,9 +563,9 @@ def close_service(service_request_id):
         flash('Service request closed successfully')
     else:
         flash('Service is not completed yet')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
 
-    return redirect(url_for('main.main.home_c'))
+    return redirect(url_for('main.home_c'))
 
 @bp.route('/cancel_service/<int:service_request_id>', methods=['POST'])
 @login_customer
@@ -579,7 +579,7 @@ def cancel_service(service_request_id):
         flash("Service request canceled successfully")
     else:
         flash("Service request not found or unauthorized action")
-    return redirect(url_for('main.main.home_c'))
+    return redirect(url_for('main.home_c'))
 
 def update_avg_rating(professional_id):
     reviews = Review.query.join(ServiceRequest).filter(ServiceRequest.professional_id == professional_id).all()
@@ -600,41 +600,41 @@ def review_service(service_request_id):
     service=Service.query.join(ServiceRequest).filter(ServiceRequest.id==service_request_id).first()
     if not service:
         flash('Service not found')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     service_request = ServiceRequest.query.get(service_request_id)
     if not service_request:
         flash('Service request not found')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     
     if service_request.service_status == 'Closed':
         flash('Service is closed')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     elif service_request.service_status == 'Rejected':
         flash('Service is rejected')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     elif service_request.service_status == 'Requested':
         flash('Service is not accepted yet')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     elif service_request.service_status == 'Accepted':
         flash('Service is not completed yet')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     
     existing_review = Review.query.filter_by(service_request_id=service_request_id).first()
     if existing_review:
         flash('Rating already done')
-        return redirect(url_for('main.main.home_c'))
+        return redirect(url_for('main.home_c'))
     
     if request.method == 'POST':
         if service_request.service_status=='Completed':
             if existing_review:
                 flash('Rating already done')
-                return redirect(url_for('main.main.home_c'))
+                return redirect(url_for('main.home_c'))
             else:
                 rating = request.form.get('rating')
                 comment = request.form.get('comment')
                 if not rating:
                     flash('Rating is required')
-                    return redirect(url_for('main.main.review_service', service_request_id=service_request_id))
+                    return redirect(url_for('main.review_service', service_request_id=service_request_id))
                 review = Review(service_request_id=service_request_id, rating=rating, comment=comment)
                 db.session.add(review)
                 service_request.service_rating = rating
@@ -645,9 +645,9 @@ def review_service(service_request_id):
                 if service_request and service_request.professional_id:
                     update_avg_rating(service_request.professional_id)
 
-                return redirect(url_for('main.main.home_c', service_request_id=service_request_id))
+                return redirect(url_for('main.home_c', service_request_id=service_request_id))
         else:
-            return redirect(url_for('main.main.home_c'))
+            return redirect(url_for('main.home_c'))
 
     return render_template('review_service.html',user_session=user_session ,service_request=service_request,servicename=service.name)
 
@@ -679,7 +679,7 @@ def search_c():
                 service_price=Service.query.filter(Service.base_price==price).all()
             except ValueError:
                 flash('Invalid price')
-                return redirect(url_for('main.main.search_c'))
+                return redirect(url_for('main.search_c'))
 
         elif search_by=="Address":
             service_address=ServiceProfessional.query.join(User).filter(User.address.ilike(f'%{search_word}%')).all()
@@ -690,7 +690,7 @@ def search_c():
                 service_pincode=ServiceProfessional.query.join(User).filter(User.pincode==pincode).all()
             except ValueError:
                 flash('Invalid pincode')
-                return redirect(url_for('main.main.search_c'))
+                return redirect(url_for('main.search_c'))
             
         return render_template('search_c.html',customer=customer,user=user,user_session=user_session,service=service,search=search_word,search_by=search_by,service_name=service_name,service_pincode=service_pincode,service_address=service_address,service_price=service_price)
     return render_template('search_c.html',customer=customer,user=user,user_session=user_session,service=service,search=search_word,search_by=search_by,service_name=service_name,service_pincode=service_pincode,service_address=service_address,service_price=service_price)
@@ -726,13 +726,13 @@ def service_professional_signup():
 
         if not email or not password or not full_name or not service_name or not experience or not add or not pincode:
             flash('Please fill out all fields')
-            return redirect(url_for('main.main.service_professional_signup'))
+            return redirect(url_for('main.service_professional_signup'))
         
         user=User.query.filter_by(email=email).first()
 
         if user:
             flash("Username already exists")
-            return redirect(url_for("main.main.service_professional_signup"))
+            return redirect(url_for("main.service_professional_signup"))
         
         password_hash=generate_password_hash(password)
 
@@ -747,7 +747,7 @@ def service_professional_signup():
             db.session.add(new_professional)
             db.session.commit()
             flash('You have successfully registered. Please login to continue.')
-            return (redirect(url_for('main.main.login'))) 
+            return (redirect(url_for('main.login'))) 
 
 @bp.route('/profile_service')
 @login_prosessional
@@ -851,11 +851,11 @@ def edit_professional():
         existing_user = User.query.filter_by(email=email).first()
         if existing_user and existing_user.id != user.id:
             flash("Email already exists")
-            return redirect(url_for('main.main.edit_professional'))
+            return redirect(url_for('main.edit_professional'))
         
         if not email or not password:
             flash('Please fill required fields')
-            return redirect(url_for('main.main.edit_professional'))
+            return redirect(url_for('main.edit_professional'))
             
         if service_name:
             service = Service.query.filter_by(name=service_name).first()
@@ -881,7 +881,7 @@ def edit_professional():
         
         db.session.commit()
         flash('Profile updated !')
-        return redirect(url_for('main.main.profile_service'))
+        return redirect(url_for('main.profile_service'))
 
 @bp.route('/view_customer/<int:request_id>')
 @login_prosessional
@@ -891,12 +891,12 @@ def view_customer(request_id):
     service_request = ServiceRequest.query.get(request_id)
     if not service_request:
         flash("Service request not found.")
-        return redirect(url_for('main.main.home_p'))
+        return redirect(url_for('main.home_p'))
     
     customer=Customer.query.join(User).filter(Customer.id == service_request.customer_id).first()
     if not customer:
         flash("Customer not found.")
-        return redirect(url_for('main.main.home_p'))
+        return redirect(url_for('main.home_p'))
 
     return render_template('view_customer.html', customer=customer,user_session=user_session)
 
@@ -908,7 +908,7 @@ def update_request_status(request_id):
     professional = ServiceProfessional.query.filter_by(user_id=session['user_id']).first()
     if service_request.professional_id != professional.id:
         flash("You are not authorized to update this request.")
-        return redirect(url_for('main.main.home_p'))
+        return redirect(url_for('main.home_p'))
 
     action = request.form.get('action')
     if action == 'Accept':
@@ -919,11 +919,11 @@ def update_request_status(request_id):
         db.session.add(r_request)
     else:
         flash("Invalid action.")
-        return redirect(url_for('main.main.home_p'))
+        return redirect(url_for('main.home_p'))
     
     db.session.commit()
     flash(f"Request has been {action}ed.")
-    return redirect(url_for('main.main.home_p'))
+    return redirect(url_for('main.home_p'))
 
 @bp.route('/complete_service/<int:request_id>', methods=['POST'])
 @login_prosessional
@@ -933,21 +933,21 @@ def complete_service(request_id):
     professional = ServiceProfessional.query.filter_by(user_id=session['user_id']).first()
     if service_request.professional_id != professional.id:
         flash("You are not authorized to update this request.")
-        return redirect(url_for('main.main.home_p'))
+        return redirect(url_for('main.home_p'))
 
     action = request.form.get('action')
     if service_request.service_status != 'Accepted':
         flash("Service request is not accepted yet.")
-        return redirect(url_for('main.main.home_p'))
+        return redirect(url_for('main.home_p'))
     elif action == 'complete':
         service_request.service_status = 'Completed'
     else:
         flash("Invalid action.")
-        return redirect(url_for('main.main.home_p'))
+        return redirect(url_for('main.home_p'))
     
     db.session.commit()
     flash(f"Service has been successfully completed.")
-    return redirect(url_for('main.main.home_p'))
+    return redirect(url_for('main.home_p'))
 
 @bp.route('/search_p', methods=['GET', 'POST'])
 @login_prosessional
@@ -972,7 +972,7 @@ def search_p():
                 service_requests = (ServiceRequest.query.join(ServiceRequest.customer).join(Customer.user).filter(and_(User.pincode == pincode,ServiceRequest.professional_id == professional.id)).all())
             except ValueError:
                 flash('Invalid pincode')
-                return redirect(url_for('main.main.search_p'))
+                return redirect(url_for('main.search_p'))
         elif search_by == 'Service_Status':
             service_requests = (ServiceRequest.query.filter(and_(ServiceRequest.service_status == search_word,ServiceRequest.professional_id == professional.id)).all())
         return (render_template('search_p.html',user_session=user_session,search=search_word,search_by=search_by,service_requests=service_requests,professional=professional,user=user))
